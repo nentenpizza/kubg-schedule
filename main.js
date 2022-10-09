@@ -162,5 +162,6 @@ main()
   .catch(async (e) => {
     console.error(e)
     await prisma.$disconnect()
+    await browser.close();
     process.exit(1)
   })
