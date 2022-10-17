@@ -5,7 +5,7 @@ const fs = require("node:fs/promises");
 
 const { OnSchedule, Validate, OnGroup, OnNearest } = require("./handlers");
 
-const prisma = require("./prisma");
+const prisma = require("./db");
 
 async function main() {
   const bot = botInit();

@@ -26,3 +26,10 @@ model Group {
   group_name String?
   pin        Boolean
 }
+
+model Cache {
+  id         Int      @id @unique @default(autoincrement())
+  date       DateTime @db.Date
+  group_name String?
+  text       String
+}

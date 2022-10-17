@@ -11,11 +11,11 @@ async function runBrowser() {
     width: 1920,
     height: 700,
   });
-    return { page, browser };
+  return { page, browser };
 }
 
 async function generateSchedule(group) {
-  let {page, browser} = await runBrowser();
+  let { page, browser } = await runBrowser();
   await page.goto("https://dekanat.kubg.edu.ua/cgi-bin/timetable.cgi?n=700");
   await page.$eval("#group", (el, g) => (el.value = g), group);
   await page.click('button[type="submit"]');
@@ -28,7 +28,7 @@ async function generateSchedule(group) {
 }
 
 async function parseNearestDay(group, current) {
-    let { page, browser } = await runBrowser();
+  let { page, browser } = await runBrowser();
   await page.goto("https://dekanat.kubg.edu.ua/cgi-bin/timetable.cgi?n=700");
   await page.$eval("#group", (el, g) => (el.value = g), group);
   await page.click('button[type="submit"]');
@@ -45,14 +45,15 @@ async function parseNearestDay(group, current) {
   const h4 = await element.$("h4");
   const title = await h4.evaluate((el) => el.textContent, h4);
   finalText += title;
+  const date = title.split(" ")[0];
 
   const tbody = await element.$$("tbody > tr");
   for (let i = 0; i < tbody.length - 1; i++) {
     const textContent = await tbody[i].evaluate((el) => el.textContent, tbody);
     finalText += "\n" + textContent;
   }
-    browser.close()
-  return finalText;
+  browser.close();
+  return { finalText, date };
 }
 
 module.exports = { generateSchedule, parseNearestDay };
