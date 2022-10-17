@@ -55,49 +55,48 @@ function OnNearest(current) {
       });
       group = chat.group_name;
     }
-      
-      let today = new Date()
-      
-      let tomorrow = new Date()
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      
-      if (!current) {
-          today.setDate(today.getDate() + 1)
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      } else {
-          today.setDate(today.getDate() - 1)
-          tomorrow.setDate(tomorrow.getDate() - 1)
-      }
 
-      const cached = await prisma.cache.findFirst({
-          where: {
-              date: {
-                  gte: today,
-                  lte: tomorrow,
-              },
-              group_name: group,
-          }
-      })
+    let today = new Date();
 
-      if (cached) {
-          await ctx.reply(cached.text);
-          return
-      }
-      
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    if (!current) {
+      today.setDate(today.getDate() + 1);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+    } else {
+      today.setDate(today.getDate() - 1);
+      tomorrow.setDate(tomorrow.getDate() - 1);
+    }
+
+    const cached = await prisma.cache.findFirst({
+      where: {
+        date: {
+          gte: today,
+          lte: tomorrow,
+        },
+        group_name: group,
+      },
+    });
+
+    if (cached) {
+      await ctx.reply(cached.text);
+      return;
+    }
+
     await ctx.reply("Ищу...");
 
     let { finalText, date } = await parseNearestDay(group, current);
-      console.log(date)
-      let pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-      let parsedDate = new Date(date.replace(pattern, '$3-$2-$1'))
+    let pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+    let parsedDate = new Date(date.replace(pattern, "$3-$2-$1"));
 
-      await prisma.cache.create({
-          data: {
-              date: parsedDate,
-              group_name: group,
-              text: finalText,
-        }
-    })
+    await prisma.cache.create({
+      data: {
+        date: parsedDate,
+        group_name: group,
+        text: finalText,
+      },
+    });
 
     await ctx.reply(finalText);
   };
@@ -177,7 +176,6 @@ async function Validate(ctx, next) {
         },
       });
     }
-    console.log(chat);
   }
 
   await next();
