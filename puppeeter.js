@@ -3,7 +3,6 @@ const puppeteer = require("puppeteer");
 async function generateSchedule(group) {
   const browser = await puppeteer.launch({
     defaultViewport: null,
-    headless: false,
   });
   const page = await browser.newPage();
   await page.setViewport({
