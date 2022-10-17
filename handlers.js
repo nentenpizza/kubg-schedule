@@ -111,14 +111,23 @@ async function OnGroup(ctx) {
   }
 
   if (ctx.chat.id !== ctx.from.id) {
-    //let member = await ctx.getChatMember(ctx.from.id);
-    // if (!member.can_promote_members) {
-    //   ctx.reply("Только администратор может менять группу!");
-    //   return;
-    // }
-    let chat = await prisma.group.update({
+    let member = await ctx.getChatMember(ctx.from.id);
+    if (member.status === "administrator" || member.status === "creator") {
+      let chat = await prisma.group.update({
+        where: {
+          group_id: ctx.chat.id,
+        },
+        data: {
+          group_name: args[1],
+        },
+      });
+      ctx.reply("Группа установлена! /schedule чтобы увидеть расписание");
+      return;
+    }
+
+    let user = await prisma.user.update({
       where: {
-        group_id: ctx.chat.id,
+        user_id: ctx.chat.id,
       },
       data: {
         group_name: args[1],
@@ -126,18 +135,10 @@ async function OnGroup(ctx) {
     });
     ctx.reply("Группа установлена! /schedule чтобы увидеть расписание");
     return;
+  } else {
+    ctx.reply("Только администратор может менять группу!");
+    return;
   }
-
-  let user = await prisma.user.update({
-    where: {
-      user_id: ctx.chat.id,
-    },
-    data: {
-      group_name: args[1],
-    },
-  });
-  ctx.reply("Группа установлена! /schedule чтобы увидеть расписание");
-  return;
 }
 
 async function Validate(ctx, next) {
