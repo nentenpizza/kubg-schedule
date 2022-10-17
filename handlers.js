@@ -25,7 +25,7 @@ async function OnSchedule(ctx) {
     scheduleFileName = await generateSchedule(group);
   } catch {
     ctx.reply(
-      "Не удалось сгенерировать расписание, возможно указан некорректный шифр группы"
+      "Не удалось сгенерировать расписание, возможно указан некорректный шифр группы (ну или разработчик даун)"
     );
     return;
   }
@@ -86,19 +86,23 @@ function OnNearest(current) {
 
     await ctx.reply("Ищу...");
 
-    let { finalText, date } = await parseNearestDay(group, current);
-    let pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-    let parsedDate = new Date(date.replace(pattern, "$3-$2-$1"));
+      try {
+          let { finalText, date } = await parseNearestDay(group, current);
+          let pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+          let parsedDate = new Date(date.replace(pattern, "$3-$2-$1"));
 
-    await prisma.cache.create({
-      data: {
-        date: parsedDate,
-        group_name: group,
-        text: finalText,
-      },
-    });
+          await prisma.cache.create({
+              data: {
+                  date: parsedDate,
+                  group_name: group,
+                  text: finalText,
+              },
+          });
 
-    await ctx.reply(finalText);
+          await ctx.reply(finalText);
+      } catch {
+          await ctx.reply("Не удалось сгенерировать расписание, возможно указан некорректный шифр группы (ну или разработчик даун)");
+      }
   };
 }
 
