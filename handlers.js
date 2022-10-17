@@ -86,23 +86,25 @@ function OnNearest(current) {
 
     await ctx.reply("Ищу...");
 
-      try {
-          let { finalText, date } = await parseNearestDay(group, current);
-          let pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-          let parsedDate = new Date(date.replace(pattern, "$3-$2-$1"));
+    try {
+      let { finalText, date } = await parseNearestDay(group, current);
+      let pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+      let parsedDate = new Date(date.replace(pattern, "$3-$2-$1"));
 
-          await prisma.cache.create({
-              data: {
-                  date: parsedDate,
-                  group_name: group,
-                  text: finalText,
-              },
-          });
+      await prisma.cache.create({
+        data: {
+          date: parsedDate,
+          group_name: group,
+          text: finalText,
+        },
+      });
 
-          await ctx.reply(finalText);
-      } catch {
-          await ctx.reply("Не удалось сгенерировать расписание, возможно указан некорректный шифр группы (ну или разработчик даун)");
-      }
+      await ctx.reply(finalText);
+    } catch {
+      await ctx.reply(
+        "Не удалось сгенерировать расписание, возможно указан некорректный шифр группы (ну или разработчик даун)"
+      );
+    }
   };
 }
 
