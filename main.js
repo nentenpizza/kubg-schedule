@@ -3,7 +3,7 @@ const { Telegraf } = require("telegraf");
 const { time } = require("console");
 const fs = require("node:fs/promises");
 
-const { OnSchedule, Validate } = require("./handlers");
+const { OnSchedule, Validate, OnGroup, OnNearest } = require("./handlers");
 
 const prisma = require("./prisma");
 
@@ -28,45 +28,10 @@ function botInit() {
 /group <Название группы>`)
   );
 
-  bot.command("group", async (ctx) => {
-    let msg = ctx.message.text;
-    let args = msg.split(" ");
-    if (args.length < 2) {
-      ctx.reply("Укажи группу!");
-      return;
-    }
-
-    if (ctx.chat.id !== ctx.from.id) {
-      let member = await ctx.getChatMember(ctx.from.id);
-      if (!member.can_promote_members) {
-        ctx.reply("Только администратор может менять группу!");
-        return;
-      }
-      let chat = await prisma.group.update({
-        where: {
-          group_id: ctx.chat.id,
-        },
-        data: {
-          group_name: args[1],
-        },
-      });
-      ctx.reply("Группа установлена! /schedule чтобы увидеть расписание");
-      return;
-    }
-
-    let user = await prisma.user.update({
-      where: {
-        user_id: ctx.chat.id,
-      },
-      data: {
-        group_name: args[1],
-      },
-    });
-    ctx.reply("Группа установлена! /schedule чтобы увидеть расписание");
-    return;
-  });
-
+  bot.command("group", OnGroup);
   bot.command("schedule", OnSchedule);
+  bot.command("current", OnNearest(true));
+  bot.command("next", OnNearest(false));
 
   bot.hears("hi", (ctx) => ctx.reply("Hey there"));
 

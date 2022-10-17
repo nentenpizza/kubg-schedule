@@ -1,6 +1,6 @@
 const fs = require("node:fs/promises");
 const prisma = require("./prisma");
-const { generateSchedule } = require("./puppeeter");
+const { generateSchedule, parseNearestDay } = require("./puppeeter");
 
 async function OnSchedule(ctx) {
   let group;
@@ -35,6 +35,71 @@ async function OnSchedule(ctx) {
     filename: "schedule.png",
   });
   await fs.unlink("./" + scheduleFileName);
+}
+
+function OnNearest(current) {
+  return async (ctx) => {
+    let group;
+    if (ctx.chat.id !== ctx.from.id) {
+      let chat = await prisma.group.findUnique({
+        where: {
+          group_id: ctx.chat.id,
+        },
+      });
+      group = chat.group_name;
+    } else {
+      let chat = await prisma.user.findUnique({
+        where: {
+          user_id: ctx.chat.id,
+        },
+      });
+      group = chat.group_name;
+    }
+    await ctx.reply("Ищу...");
+    let dayText;
+
+    dayText = await parseNearestDay(group, current);
+
+    await ctx.reply(dayText);
+  };
+}
+
+async function OnGroup(ctx) {
+  let msg = ctx.message.text;
+  let args = msg.split(" ");
+  if (args.length < 2) {
+    ctx.reply("Укажи группу!");
+    return;
+  }
+
+  if (ctx.chat.id !== ctx.from.id) {
+    //let member = await ctx.getChatMember(ctx.from.id);
+    // if (!member.can_promote_members) {
+    //   ctx.reply("Только администратор может менять группу!");
+    //   return;
+    // }
+    let chat = await prisma.group.update({
+      where: {
+        group_id: ctx.chat.id,
+      },
+      data: {
+        group_name: args[1],
+      },
+    });
+    ctx.reply("Группа установлена! /schedule чтобы увидеть расписание");
+    return;
+  }
+
+  let user = await prisma.user.update({
+    where: {
+      user_id: ctx.chat.id,
+    },
+    data: {
+      group_name: args[1],
+    },
+  });
+  ctx.reply("Группа установлена! /schedule чтобы увидеть расписание");
+  return;
 }
 
 async function Validate(ctx, next) {
@@ -79,4 +144,4 @@ async function Validate(ctx, next) {
   await next();
 }
 
-module.exports = { OnSchedule, Validate };
+module.exports = { OnSchedule, Validate, OnGroup, OnNearest };
