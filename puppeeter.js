@@ -14,10 +14,12 @@ async function runBrowser() {
     width: 1920,
     height: 700,
   });
-  } catch(e){
-    console.log(e)
-  }
   return { page, browser };
+  } catch(e){
+    console.log(e);
+    throw new Error(e);
+  }
+  
 }
 
 async function generateSchedule(group) {
@@ -35,6 +37,7 @@ async function generateSchedule(group) {
   return filename;
   } catch(e){
     console.log(e);
+    throw new Error(e);
   }
 }
 
