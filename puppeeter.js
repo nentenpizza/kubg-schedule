@@ -2,6 +2,7 @@ const puppeteer = require("puppeteer");
 
 const browserConfig = {
   defaultViewport: null,
+  executablePath: "./chrome",
 };
 
 async function runBrowser() {
