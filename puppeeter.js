@@ -6,12 +6,16 @@ const browserConfig = {
 };
 
 async function runBrowser() {
+  try {
   const browser = await puppeteer.launch(browserConfig);
   const page = await browser.newPage();
   await page.setViewport({
     width: 1920,
     height: 700,
   });
+  } catch(e){
+    console.log(e)
+  }
   return { page, browser };
 }
 
