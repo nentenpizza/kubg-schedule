@@ -23,10 +23,11 @@ async function OnSchedule(ctx) {
   let scheduleFileName;
   try {
     scheduleFileName = await generateSchedule(group);
-  } catch {
+  } catch(e) {
     ctx.reply(
       "Не удалось сгенерировать расписание, возможно указан некорректный шифр группы (ну или разработчик даун)"
     );
+    console.log(e);
     return;
   }
   let file = await fs.readFile("./" + scheduleFileName);
