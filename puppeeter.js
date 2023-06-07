@@ -3,6 +3,7 @@ const puppeteer = require("puppeteer");
 const browserConfig = {
   defaultViewport: null,
   executablePath: process.env.PUP,
+  args: ['--no-sandbox'],
 };
 
 async function runBrowser() {
