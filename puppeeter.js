@@ -22,6 +22,7 @@ async function runBrowser() {
 
 async function generateSchedule(group) {
   let { page, browser } = await runBrowser();
+  try{
   await page.goto("https://dekanat.kubg.edu.ua/cgi-bin/timetable.cgi?n=700");
   await page.$eval("#group", (el, g) => (el.value = g), group);
   await page.click('button[type="submit"]');
@@ -30,7 +31,11 @@ async function generateSchedule(group) {
   let filename = Date.now().toString() + ".png";
   await page.screenshot({ path: filename, fullPage: true });
   browser.close();
+  
   return filename;
+  } catch(e){
+    console.log(e);
+  }
 }
 
 async function parseNearestDay(group, current) {
